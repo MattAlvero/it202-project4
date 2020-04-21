@@ -44,13 +44,11 @@
             <div id="screen1">
                 <h1>Search for countries</h1>
                 <p>Add countries that you want to see the COVID-19 data for</p>
-                <input list="countries">
-                <datalist id="countries">
-                    
-                </datalist>
-                <input type="submit" value="Add">
-                <div id="countries_selected">
-                    
+                <input list="countries" id="input_country">
+                <datalist id="countries"></datalist>
+                <input type="submit" value="Add" id="add_country">
+                <div>
+                    <p id="countries_selected"></p>
                 </div>
                 <button class="mdc-button mdc-button--raised">
                   <div class="mdc-button__ripple"></div>
@@ -60,18 +58,82 @@
             
             <!-- Screen 2 -->
             <div id="screen2">
-                
+                <h1>Data Tables</h1>
+                <table id="dtable">
+                    
+                </table>
             </div>
             
             <!-- Screen 3 -->
             <div id="screen3">
+                <h1>Data Chart</h1>
                 <div id="covid19_chart">
                     
                 </div>
             </div>
             
         </main>
-        <script src="js/script.js"></script>
+        
+        <script>
+            const drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
+            
+            const listEl = document.querySelector('.mdc-drawer .mdc-list');
+            const mainContentEl = document.querySelector('.main-content');
+            const button = document.querySelector('.mdc-top-app-bar__navigation-icon')
+
+            button.addEventListener('click', (event) => {
+              if (drawer.open)
+                  drawer.open = false;
+              else {
+                  drawer.open = true;
+              }
+            });
+            
+            fetch("https://pomber.github.io/covid19/timeseries.json")
+              .then(response => response.json())
+              .then(data => {
+                for (x in data) {
+                    // console.log(x);
+                    let opt = document.createElement("option");
+                    opt.value = x;
+                    document.querySelector('#countries').appendChild(opt);
+                }
+              });
+
+            let countries = [];
+
+            document.querySelector('#add_country').addEventListener('click', function(){
+                let country = document.querySelector('#input_country').value;
+                let select_list = document.querySelector('#countries_selected');
+                if (country != '') {
+                    countries.push(country);
+                    let node = document.createTextNode(country + ' ');
+                    select_list.appendChild(node);
+                }
+            });
+            
+            let create = document.querySelector('.mdc-button');
+            create.addEventListener('click', function(){
+                var dtable = document.querySelector('#dtable');
+                var header = dtable.createTHead();
+                var hrow = header.insertRow();
+                var dcell = hrow.insertCell();
+                dcell.innerHTML = "Date"
+                fetch("https://pomber.github.io/covid19/timeseries.json")
+              .then(response => response.json())
+              .then(data => {
+                for (x of countries) {
+                    // console.log(x);
+                    hrow.insertCell().innerHTML = x;
+                    data[x].forEach(({date, confirmed}) => {
+                        var insRow = dtable.insertRow();
+                        insRow.insertCell().innerHTML =  date;
+                        insRow.insertCell().innerHTML = confirmed;
+                    });
+                }
+              });
+            });
+        </script>
         
     </body>
 </html>

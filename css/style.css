@@ -1,3 +1,18 @@
 body {
     margin: 0px;
 }
+#dtable {
+    border: 1px solid #ddd;
+    text-align: left;
+    border-collapse: collapse;
+    width: 100%;
+}
+#dtable, th, td {
+    padding: 10px;
+}
+#screen2 {
+    display: none;
+}
+#screen3 {
+    display: none;
+}
